@@ -33,7 +33,7 @@ public class WeatherBlanketApplication {
 			java.time.LocalTime agora = java.time.LocalTime.now(ZONA_BRASIL);
 			DateTimeFormatter fHora = DateTimeFormatter.ofPattern("HH:mm");
 
-			if (agora.getHour() != 17) {
+			if (agora.getHour() != 15) {
 				double temperatura = buscarTemperatura();
 				if (temperatura != Double.MIN_VALUE) {
 					System.out.println("Horário captado. Sem necessidade de registro de temperatura. Hora: " + agora.format(fHora));
@@ -41,7 +41,7 @@ public class WeatherBlanketApplication {
 			}
 
 
-			if (agora.getHour() == 17) {
+			if (agora.getHour() == 15) {
 				System.out.println("Horário captado e iniciando registro de temperatura. Hora: " + agora.format(fHora));
 				double temperatura = buscarTemperatura();
 				if (temperatura != Double.MIN_VALUE) {
