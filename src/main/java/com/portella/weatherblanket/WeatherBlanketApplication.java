@@ -87,7 +87,7 @@ public class WeatherBlanketApplication {
 			if (temperatura != Double.MIN_VALUE) {
 				salvarNoCsv(temperatura);
 			}
-		}, 2, 2, java.util.concurrent.TimeUnit.HOURS);
+		}, 24, 24, java.util.concurrent.TimeUnit.HOURS);
 	}
 
 	private static double buscarTemperatura() {
