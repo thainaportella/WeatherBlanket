@@ -18,6 +18,8 @@ import java.time.format.DateTimeFormatter;
 public class WeatherBlanketApplication {
 	private static final String CSV_PATH = "src/main/resources/data/temperaturas.csv";
 	private static final ZoneId ZONA_BRASIL = ZoneId.of("America/Sao_Paulo");
+	private static final int REGISTERING_HOUR = 17;
+	private static int await = 1;
 
 
 	public static void main(String[] args) {
@@ -33,38 +35,59 @@ public class WeatherBlanketApplication {
 			java.time.LocalTime agora = java.time.LocalTime.now(ZONA_BRASIL);
 			DateTimeFormatter fHora = DateTimeFormatter.ofPattern("HH:mm");
 
-			if (agora.getHour() != 15) {
-				double temperatura = buscarTemperatura();
-				if (temperatura != Double.MIN_VALUE) {
-					System.out.println("Horário captado. Sem necessidade de registro de temperatura. Hora: " + agora.format(fHora));
-				}
+			if (agora.getHour() < REGISTERING_HOUR) {
+				await = REGISTERING_HOUR - agora.getHour();
+
+				System.out.println(
+						"""
+                        A temperatura será registrada mais tarde hoje. Hora agora: %s
+                        Tempo de espera até o próximo registro: %s hora(s)
+                        """.formatted(
+								agora.format(fHora),
+								await
+						)
+				);
+			} else if(agora.getHour() > REGISTERING_HOUR) {
+				await = (24 - agora.getHour()) + REGISTERING_HOUR;
+
+				System.out.println(
+						"""
+                        Sem necessidade de registro de temperatura hoje. Hora: %s
+                        Tempo de espera até o próximo registro: %s hora(s)
+                        """.formatted(
+								agora.format(fHora),
+								await
+						)
+				);
 			}
 
-
-			if (agora.getHour() == 15) {
+			if (agora.getHour() == REGISTERING_HOUR) {
 				System.out.println("Horário captado e iniciando registro de temperatura. Hora: " + agora.format(fHora));
 				double temperatura = buscarTemperatura();
 				if (temperatura != Double.MIN_VALUE) {
 					salvarNoCsv(temperatura);
 				}
-
 				scheduler.shutdown();
 				agendarApos15h();
 			}
-		}, 0, 1, java.util.concurrent.TimeUnit.HOURS);
+		}, 0, await, java.util.concurrent.TimeUnit.MINUTES);
 	}
 
 	private static void agendarApos15h() {
 		java.util.concurrent.ScheduledExecutorService scheduler24h =
 				java.util.concurrent.Executors.newSingleThreadScheduledExecutor();
-
+		System.out.println("Próximo registro de temperatura para daqui a 24 horas.");
 
 		scheduler24h.scheduleAtFixedRate(() -> {
+			java.time.LocalTime agora = java.time.LocalTime.now(ZONA_BRASIL);
+			DateTimeFormatter fHora = DateTimeFormatter.ofPattern("HH:mm");
+
+			System.out.println("Horário captado e iniciando registro de temperatura. Hora: " + agora.format(fHora));
 			double temperatura = buscarTemperatura();
 			if (temperatura != Double.MIN_VALUE) {
 				salvarNoCsv(temperatura);
 			}
-		}, 24, 24, java.util.concurrent.TimeUnit.HOURS);
+		}, 2, 2, java.util.concurrent.TimeUnit.MINUTES);
 	}
 
 	private static double buscarTemperatura() {
@@ -94,35 +117,25 @@ public class WeatherBlanketApplication {
 		try {
 			Path path = Paths.get(CSV_PATH);
 			Files.createDirectories(path.getParent());
-			ColorsEnum cor = ColorsEnum.fromTemperatura(temperatura);
-
-
-			boolean novoArquivo = !Files.exists(path);
-
 
 			try (BufferedWriter writer = new BufferedWriter(new FileWriter(CSV_PATH, true))) {
-				if (novoArquivo) {
-					writer.write("data,hour,temp_celsius,cor,cor_oficial");
-					writer.newLine();
-				}
-
+				ColorsEnum cor = ColorsEnum.fromTemperatura(temperatura);
 
 				LocalDate data = LocalDate.now(ZONA_BRASIL);
 				LocalTime hora = LocalTime.now(ZONA_BRASIL);
 				DateTimeFormatter fData = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 				DateTimeFormatter fHora = DateTimeFormatter.ofPattern("HH:mm");
 
-
 				writer.write(data.format(fData) +
 						"," + hora.format(fHora) +
 						"," + temperatura +
 						"," + cor.name() +
 						"," + cor.getNomeOficial());
+
 				writer.newLine();
+
+				System.out.println("Temperatura de " + temperatura + " registrada. Cor associada: " + cor.name());
 			}
-
-
-			System.out.println("Temperatura de " + temperatura + " registrada. Cor associada: " + cor.name());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
