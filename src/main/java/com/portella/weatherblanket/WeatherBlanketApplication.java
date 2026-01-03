@@ -18,7 +18,7 @@ import java.time.format.DateTimeFormatter;
 public class WeatherBlanketApplication {
 	private static final String CSV_PATH = "src/main/resources/data/temperaturas.csv";
 	private static final ZoneId ZONA_BRASIL = ZoneId.of("America/Sao_Paulo");
-	private static final int REGISTERING_HOUR = 17;
+	private static final int REGISTERING_HOUR = 15;
 	private static int await = 1;
 
 
@@ -70,7 +70,7 @@ public class WeatherBlanketApplication {
 				scheduler.shutdown();
 				agendarApos15h();
 			}
-		}, 0, await, java.util.concurrent.TimeUnit.MINUTES);
+		}, 0, await, java.util.concurrent.TimeUnit.HOURS);
 	}
 
 	private static void agendarApos15h() {
@@ -87,7 +87,7 @@ public class WeatherBlanketApplication {
 			if (temperatura != Double.MIN_VALUE) {
 				salvarNoCsv(temperatura);
 			}
-		}, 2, 2, java.util.concurrent.TimeUnit.MINUTES);
+		}, 2, 2, java.util.concurrent.TimeUnit.HOURS);
 	}
 
 	private static double buscarTemperatura() {
