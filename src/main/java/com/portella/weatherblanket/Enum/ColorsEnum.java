@@ -5,14 +5,14 @@ import java.math.RoundingMode;
 
 public enum ColorsEnum {
 
-    ROXO(null, 13.0, "ametista violeta"),
-    ANIL(14.0, 16.0, "anil profundo"),
-    AZUL(17.0, 19.0, "azul candy"),
-    VERDE(20.0, 22.0, "musgo verde"),
-    AMARELO(23.0, 25.0, "solar"),
-    MOSTARDA(26.0, 28.0, "mostarda"),
-    LARANJA(29.0, 31.0, "brasa"),
-    VERMELHO(32.0, 34.0, "paixão"),
+    ROXO(null, 13.9, "ametista violeta"),
+    ANIL(14.0, 16.9, "anil profundo"),
+    AZUL(17.0, 19.9, "azul candy"),
+    VERDE(20.0, 22.9, "musgo verde"),
+    AMARELO(23.0, 25.9, "solar"),
+    MOSTARDA(26.0, 28.9, "mostarda"),
+    LARANJA(29.0, 31.9, "brasa"),
+    VERMELHO(32.0, 34.9, "paixão"),
     VINHO(35.0, null, "devoção");
 
     private final Double minTemp;
