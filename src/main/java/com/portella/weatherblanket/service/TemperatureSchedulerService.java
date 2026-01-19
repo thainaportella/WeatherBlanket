@@ -1,6 +1,7 @@
 package com.portella.weatherblanket.service;
 
 import com.portella.weatherblanket.Enum.ColorsEnum;
+import com.portella.weatherblanket.config.LocationConfig;
 import jakarta.annotation.PostConstruct;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -23,10 +24,8 @@ import java.time.format.DateTimeFormatter;
 @Service
 public class TemperatureSchedulerService {
     private static final String CSV_PATH = "/home/weather/data/registros.csv";
-
     private static final ZoneId ZONA_BRASIL = ZoneId.of("America/Sao_Paulo");
     private static final int REGISTERING_HOUR = 15;
-
     private static LocalDate ultimaDataRegistrada;
 
     @PostConstruct
@@ -79,8 +78,13 @@ public class TemperatureSchedulerService {
 
     private static double buscarTemperatura() {
         try {
+            double lat = LocationConfig.getLatitude();
+            double lon = LocationConfig.getLongitude();
+
             URL url = new URL(
-                    "https://api.open-meteo.com/v1/forecast?latitude=-22.41826&longitude=-42.97477&current=temperature_2m"
+                    "https://api.open-meteo.com/v1/forecast?latitude=" + lat +
+                            "&longitude=" + lon +
+                            "&current=temperature_2m"
             );
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();

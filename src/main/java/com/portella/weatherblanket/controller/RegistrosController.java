@@ -63,7 +63,6 @@ public class RegistrosController {
             ));
         }
 
-        // 🔹 ORDENAÇÃO POR DATA
         registros.sort((a, b) -> {
             LocalDate da = LocalDate.parse(a.data());
             LocalDate db = LocalDate.parse(b.data());
@@ -72,7 +71,6 @@ public class RegistrosController {
                     : db.compareTo(da);
         });
 
-        // 🔹 LIMITE
         if (limit != null && limit > 0 && limit < registros.size()) {
             registros = registros.subList(0, limit);
         }
