@@ -3,6 +3,7 @@ package com.portella.weatherblanket.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.portella.weatherblanket.config.LocationConfig;
+import com.portella.weatherblanket.entities.NominatimClient;
 import com.portella.weatherblanket.exceptions.ServiceException;
 import com.portella.weatherblanket.model.Localizacao;
 import org.springframework.stereotype.Service;

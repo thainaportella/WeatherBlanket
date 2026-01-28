@@ -10,7 +10,7 @@ public class RegistrosGetContract {
             new EndpointContract(
                     "/registros",
                     "GET",
-                    Set.of("limit"),
+                    Set.of("limit", "mes", "ano", "order"),
                     false
             );
 }

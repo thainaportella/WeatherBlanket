@@ -1,6 +1,8 @@
 package com.portella.weatherblanket.service;
 
+import com.portella.weatherblanket.entities.NominatimClient;
 import com.portella.weatherblanket.exceptions.ServiceException;
+import com.portella.weatherblanket.factory.HttpConnectionFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

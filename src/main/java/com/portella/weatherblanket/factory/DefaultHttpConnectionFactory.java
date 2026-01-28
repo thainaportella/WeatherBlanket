@@ -1,4 +1,4 @@
-package com.portella.weatherblanket.service;
+package com.portella.weatherblanket.factory;
 
 import org.springframework.stereotype.Service;
 

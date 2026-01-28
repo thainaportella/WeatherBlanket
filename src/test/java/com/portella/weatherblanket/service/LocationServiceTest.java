@@ -1,5 +1,6 @@
 package com.portella.weatherblanket.service;
 
+import com.portella.weatherblanket.entities.NominatimClient;
 import com.portella.weatherblanket.exceptions.ServiceException;
 import com.portella.weatherblanket.model.Localizacao;
 import org.junit.jupiter.api.Test;

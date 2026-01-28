@@ -1,4 +1,4 @@
-package com.portella.weatherblanket.service;
+package com.portella.weatherblanket.factory;
 
 import java.net.HttpURLConnection;
 import java.net.URL;

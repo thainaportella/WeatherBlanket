@@ -1,4 +1,4 @@
-package com.portella.weatherblanket.DTO;
+package com.portella.weatherblanket.entities;
 
 import com.portella.weatherblanket.exceptions.ServiceException;
 

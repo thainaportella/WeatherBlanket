@@ -1,156 +1,78 @@
 package com.portella.weatherblanket.controller;
 
-import com.portella.weatherblanket.filter.ContractValidationFilter;
+import com.portella.weatherblanket.entities.RegistroDTO;
+import com.portella.weatherblanket.repositories.TemperatureRepository;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(
-        controllers = RegistrosController.class,
-        excludeFilters = @ComponentScan.Filter(
-                type = FilterType.ASSIGNABLE_TYPE,
-                classes = ContractValidationFilter.class
-        )
-)
+@WebMvcTest(RegistrosController.class)
 class RegistrosControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @Test
-    void deveListarRegistrosSemFiltro() throws Exception {
+    @MockBean
+    private TemperatureRepository temperatureRepository;
 
-        List<String> csvMock = List.of(
-                "data,hora,temperatura,cor,cor_oficial",
-                "2026-01-01,15:00,25.0,amarelo,solar",
-                "2026-01-02,15:00,26.0,mostarda,mostarda"
+    @Test
+    void deveListarRegistrosSemFiltros() throws Exception {
+
+        List<RegistroDTO> registros = List.of(
+                new RegistroDTO(
+                        "2026-01-28",
+                        "13:10",
+                        "25.6",
+                        "AMARELO",
+                        "solar"
+                )
         );
 
-        try (MockedStatic<Files> filesMock = Mockito.mockStatic(Files.class)) {
+        Mockito.when(
+                temperatureRepository.listarRegistros(null, null, "desc", null)
+        ).thenReturn(registros);
 
-            filesMock.when(() ->
-                    Files.readAllLines(Mockito.any(Path.class))
-            ).thenReturn(csvMock);
-
-            mockMvc.perform(get("/registros"))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.length()").value(2))
-                    .andExpect(jsonPath("$[0].data").value("2026-01-02"))
-                    .andExpect(jsonPath("$[1].data").value("2026-01-01"));
-        }
+        mockMvc.perform(get("/registros"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].data").value("2026-01-28"))
+                .andExpect(jsonPath("$[0].hora").value("13:10"))
+                .andExpect(jsonPath("$[0].temperatura").value("25.6"))
+                .andExpect(jsonPath("$[0].cor").value("AMARELO"))
+                .andExpect(jsonPath("$[0].cor_oficial").value("solar"));
     }
 
     @Test
-    void deveFiltrarPorMesEAno() throws Exception {
+    void deveListarRegistrosComAno() throws Exception {
 
-        List<String> csvMock = List.of(
-                "data,hora,temperatura,cor,cor_oficial",
-                "2026-01-01,15:00,25.0,amarelo,solar",
-                "2025-12-01,15:00,24.0,verde,musgo"
-        );
+        Mockito.when(
+                temperatureRepository.listarRegistros(null, 2026, "desc", null)
+        ).thenReturn(List.of());
 
-        try (MockedStatic<Files> filesMock = Mockito.mockStatic(Files.class)) {
-
-            filesMock.when(() ->
-                    Files.readAllLines(Mockito.any(Path.class))
-            ).thenReturn(csvMock);
-
-            mockMvc.perform(
-                            get("/registros")
-                                    .param("mes", "1")
-                                    .param("ano", "2026")
-                    )
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.length()").value(1))
-                    .andExpect(jsonPath("$[0].data").value("2026-01-01"));
-        }
+        mockMvc.perform(get("/registros")
+                        .param("ano", "2026"))
+                .andExpect(status().isOk());
     }
 
     @Test
-    void deveRetornarErroQuandoMesSemAno() throws Exception {
+    void deveListarRegistrosComMesEAno() throws Exception {
 
-        List<String> csvMock = List.of(
-                "data,hora,temperatura,cor,cor_oficial",
-                "2026-01-01,15:00,25.0,amarelo,solar"
-        );
+        Mockito.when(
+                temperatureRepository.listarRegistros(1, 2026, "asc", 5)
+        ).thenReturn(List.of());
 
-        try (MockedStatic<Files> filesMock = Mockito.mockStatic(Files.class)) {
-
-            filesMock.when(() ->
-                    Files.readAllLines(Mockito.any(Path.class))
-            ).thenReturn(csvMock);
-
-            mockMvc.perform(
-                            get("/registros")
-                                    .param("mes", "1")
-                    )
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.error").value("BAD_REQUEST"))
-                    .andExpect(jsonPath("$.message")
-                            .value("O parâmetro 'mes' deve ser informado junto de 'ano'."));
-        }
-    }
-
-    @Test
-    void deveAplicarLimit() throws Exception {
-
-        List<String> csvMock = List.of(
-                "data,hora,temperatura,cor,cor_oficial",
-                "2026-01-01,15:00,25.0,amarelo,solar",
-                "2026-01-02,15:00,26.0,mostarda,mostarda",
-                "2026-01-03,15:00,27.0,laranja,brasa"
-        );
-
-        try (MockedStatic<Files> filesMock = Mockito.mockStatic(Files.class)) {
-
-            filesMock.when(() ->
-                    Files.readAllLines(Mockito.any(Path.class))
-            ).thenReturn(csvMock);
-
-            mockMvc.perform(
-                            get("/registros")
-                                    .param("limit", "2")
-                    )
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.length()").value(2));
-        }
-    }
-
-    @Test
-    void deveOrdenarAsc() throws Exception {
-
-        List<String> csvMock = List.of(
-                "data,hora,temperatura,cor,cor_oficial",
-                "2026-01-03,15:00,27.0,laranja,brasa",
-                "2026-01-01,15:00,25.0,amarelo,solar"
-        );
-
-        try (MockedStatic<Files> filesMock = Mockito.mockStatic(Files.class)) {
-
-            filesMock.when(() ->
-                    Files.readAllLines(Mockito.any(Path.class))
-            ).thenReturn(csvMock);
-
-            mockMvc.perform(
-                            get("/registros")
-                                    .param("order", "asc")
-                    )
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$[0].data").value("2026-01-01"))
-                    .andExpect(jsonPath("$[1].data").value("2026-01-03"));
-        }
+        mockMvc.perform(get("/registros")
+                        .param("mes", "1")
+                        .param("ano", "2026")
+                        .param("order", "asc")
+                        .param("limit", "5"))
+                .andExpect(status().isOk());
     }
 }

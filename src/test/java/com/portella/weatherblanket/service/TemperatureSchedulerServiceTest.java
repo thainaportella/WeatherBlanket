@@ -1,5 +1,7 @@
 package com.portella.weatherblanket.service;
 
+import com.portella.weatherblanket.entities.WeatherClient;
+import com.portella.weatherblanket.repositories.TemperatureRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

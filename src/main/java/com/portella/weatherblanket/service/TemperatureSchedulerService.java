@@ -1,6 +1,8 @@
 package com.portella.weatherblanket.service;
 
 import com.portella.weatherblanket.config.LocationConfig;
+import com.portella.weatherblanket.entities.WeatherClient;
+import com.portella.weatherblanket.repositories.TemperatureRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -12,7 +14,7 @@ import java.time.ZoneId;
 public class TemperatureSchedulerService {
 
     private static final ZoneId ZONA_BRASIL = ZoneId.of("America/Sao_Paulo");
-    private static final int REGISTERING_HOUR = 19;
+    private static final int REGISTERING_HOUR = 13;
 
     private final WeatherClient weatherClient;
     private final TemperatureRepository repository;

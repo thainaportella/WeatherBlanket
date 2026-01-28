@@ -1,5 +1,6 @@
-package com.portella.weatherblanket.service;
+package com.portella.weatherblanket.entities;
 
+import com.portella.weatherblanket.factory.HttpConnectionFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
