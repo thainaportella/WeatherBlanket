@@ -1,4 +1,6 @@
-package com.portella.weatherblanket.Enum;
+package com.portella.weatherblanket.DTO;
+
+import com.portella.weatherblanket.exceptions.ServiceException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -47,7 +49,6 @@ public enum ColorsEnum {
      */
     public static ColorsEnum fromTemperatura(double temperatura) {
 
-        // padroniza para 1 casa decimal (opcional, mas recomendado)
         double tempNormalizada = BigDecimal
                 .valueOf(temperatura)
                 .setScale(1, RoundingMode.HALF_UP)
@@ -59,9 +60,7 @@ public enum ColorsEnum {
             }
         }
 
-        throw new IllegalArgumentException(
-                "Temperatura fora das faixas configuradas: " + tempNormalizada
-        );
+        throw new ServiceException(500, "TEMPERATURE_RANGE_ERROR", "Temperatura fora das faixas configuradas: " + tempNormalizada);
     }
 }
 

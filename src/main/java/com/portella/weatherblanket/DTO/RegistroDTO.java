@@ -1,4 +1,4 @@
-package com.portella.weatherblanket.controller;
+package com.portella.weatherblanket.DTO;
 
 public record RegistroDTO(
         String data,

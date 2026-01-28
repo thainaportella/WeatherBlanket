@@ -1,0 +1,171 @@
+openapi: 3.0.3
+
+info:
+  title: Weather Blanket API
+  description: API pessoal para registro e consulta de temperaturas e localização.
+  version: 1.0.0
+
+servers:
+  - url: http://157.173.123.125:8080
+    description: Produção
+  - url: http://localhost:8080
+    description: Ambiente local
+
+paths:
+
+  /registros:
+    get:
+      summary: Lista registros de temperatura
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RegistroTemperatura'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /localizacao:
+    get:
+      summary: Obtém localização atual
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Localizacao'
+
+    put:
+      summary: Atualiza localização
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocalizacaoRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Localizacao'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /localizacao/reset:
+    put:
+      summary: Reseta localização padrão
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Localizacao'
+
+components:
+
+  schemas:
+
+    RegistroTemperatura:
+      type: object
+      required:
+        - data
+        - hora
+        - temperatura
+        - cor
+        - cor_oficial
+      properties:
+        data:
+          type: string
+        hora:
+          type: string
+        temperatura:
+          type: number
+          format: double
+        cor:
+          type: string
+        cor_oficial:
+          type: string
+
+    Localizacao:
+      type: object
+      required:
+        - latitude
+        - longitude
+        - cidade
+        - estado
+        - pais
+      properties:
+        latitude:
+          type: number
+          format: double
+          example: -22.65758
+        longitude:
+          type: number
+          format: double
+          example: -43.03837
+        cidade:
+          type: string
+          example: "Magé"
+        estado:
+          type: string
+          example: "RJ"
+        pais:
+          type: string
+          example: "Brasil"
+
+
+    LocalizacaoRequest:
+      type: object
+      required:
+        - latitude
+        - longitude
+      properties:
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+
+    ErrorResponse:
+      type: object
+      required:
+        - status
+        - error
+        - message
+      properties:
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+
+  responses:
+
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    InternalError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'

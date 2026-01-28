@@ -2,47 +2,27 @@ package com.portella.weatherblanket.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.portella.weatherblanket.model.LocationInfo;
+import com.portella.weatherblanket.config.LocationConfig;
+import com.portella.weatherblanket.exceptions.ServiceException;
+import com.portella.weatherblanket.model.Localizacao;
+import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
+@Service
 public class LocationService {
 
-    public LocationInfo buscarLocalizacao(double latitude, double longitude) {
+    private final NominatimClient nominatimClient;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public LocationService(NominatimClient nominatimClient) {
+        this.nominatimClient = nominatimClient;
+    }
+
+    public Localizacao buscarLocalizacao(double latitude, double longitude) {
 
         try {
-            String urlStr =
-                    "https://nominatim.openstreetmap.org/reverse" +
-                            "?lat=" + latitude +
-                            "&lon=" + longitude +
-                            "&format=json" +
-                            "&addressdetails=1";
+            String json = nominatimClient.buscarEndereco(latitude, longitude);
 
-            URL url = new URL(urlStr);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-            conn.setRequestMethod("GET");
-
-            conn.setRequestProperty(
-                    "User-Agent",
-                    "WeatherBlanket/1.0 (contato@weatherblanket.local)"
-            );
-
-            BufferedReader reader =
-                    new BufferedReader(new InputStreamReader(conn.getInputStream()));
-
-            StringBuilder response = new StringBuilder();
-            String line;
-
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
-            }
-
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode root = mapper.readTree(response.toString());
+            JsonNode root = objectMapper.readTree(json);
             JsonNode address = root.path("address");
 
             String cidade =
@@ -55,7 +35,7 @@ public class LocationService {
             String estado = address.path("state").asText("");
             String pais = address.path("country").asText("");
 
-            return new LocationInfo(
+            Localizacao localizacao = new Localizacao(
                     latitude,
                     longitude,
                     cidade,
@@ -63,9 +43,20 @@ public class LocationService {
                     pais
             );
 
+            LocationConfig.setLatitude(latitude);
+            LocationConfig.setLongitude(longitude);
+            LocationConfig.setCidade(cidade);
+            LocationConfig.setEstado(estado);
+            LocationConfig.setPais(pais);
+
+            return localizacao;
+
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw new ServiceException(
+                    500,
+                    "LOCATION_PARSE_ERROR",
+                    "Erro ao processar localização"
+            );
         }
     }
 }
