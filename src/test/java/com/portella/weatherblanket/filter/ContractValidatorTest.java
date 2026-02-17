@@ -1,7 +1,6 @@
-package com.portella.weatherblanket.support;
+package com.portella.weatherblanket.filter;
 
 import com.portella.weatherblanket.exceptions.ContractViolationException;
-import com.portella.weatherblanket.filter.EndpointContract;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -64,7 +63,7 @@ class ContractValidatorTest {
         when(contract.getMethod()).thenReturn("GET");
 
         when(request.getParameterMap())
-                .thenReturn(Map.of("paramInvalido", new String[]{"1"}));
+                .thenReturn(Map.of("invalidParam", new String[]{"1"}));
 
         when(contract.getQueryParams()).thenReturn(Set.of("limit"));
         when(contract.isBodyRequired()).thenReturn(false);
@@ -76,7 +75,7 @@ class ContractValidatorTest {
 
         assertEquals(400, ex.getStatus());
         assertEquals("INVALID_QUERY_PARAM", ex.getError());
-        assertTrue(ex.getMessage().contains("paramInvalido"));
+        assertTrue(ex.getMessage().contains("invalidParam"));
     }
 
     @Test

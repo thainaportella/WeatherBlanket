@@ -1,5 +1,5 @@
 package com.portella.weatherblanket.entities;
 
 public interface WeatherClient {
-    double buscarTemperatura(double lat, double lon);
+    double getTemperature(double lat, double lon);
 }

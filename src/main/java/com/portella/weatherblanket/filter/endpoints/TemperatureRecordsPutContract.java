@@ -4,15 +4,13 @@ import com.portella.weatherblanket.filter.EndpointContract;
 
 import java.util.Set;
 
-public class LocalizacaoPutContract {
+public class TemperatureRecordsPutContract {
 
     public static final EndpointContract CONTRACT =
             new EndpointContract(
-                    "/localizacao",
+                    "/temperature-records/{date}/done",
                     "PUT",
                     Set.of(),
-                    true
+                    false
             );
 }
-
-

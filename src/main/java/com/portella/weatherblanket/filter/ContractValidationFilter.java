@@ -1,7 +1,6 @@
 package com.portella.weatherblanket.filter;
 
 import com.portella.weatherblanket.exceptions.ContractViolationException;
-import com.portella.weatherblanket.support.ContractValidator;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,7 +21,7 @@ public class ContractValidationFilter extends OncePerRequestFilter {
             throws IOException, ServletException {
 
         try {
-            ContractRegistry.find(request.getRequestURI())
+            ContractRegistry.find(request.getRequestURI(), request.getMethod())
                     .ifPresent(contract ->
                             ContractValidator.validate(request, contract)
                     );

@@ -2,17 +2,20 @@ package com.portella.weatherblanket.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.portella.weatherblanket.filter.ContractValidationFilter;
-import com.portella.weatherblanket.model.Localizacao;
-import com.portella.weatherblanket.model.LocalizacaoRequest;
+import com.portella.weatherblanket.model.LocationRequest;
+import com.portella.weatherblanket.model.LocationResponse;
 import com.portella.weatherblanket.service.LocationService;
+import com.portella.weatherblanket.service.TokenService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -27,21 +30,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 classes = ContractValidationFilter.class
         )
 )
+@AutoConfigureMockMvc(addFilters = false)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class LocationControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
     @MockBean
     private LocationService locationService;
-
+    @MockBean
+    private TokenService tokenService;
     @Autowired
     private ObjectMapper objectMapper;
 
     @Test
     void deveBuscarLocalizacaoAtual() throws Exception {
 
-        Localizacao mock = new Localizacao(
+        LocationResponse mock = new LocationResponse(
                 -22.42,
                 -42.98,
                 "Magé",
@@ -49,26 +54,26 @@ class LocationControllerTest {
                 "Brasil"
         );
 
-        Mockito.when(locationService.buscarLocalizacao(
+        Mockito.when(locationService.getLocation(
                 Mockito.anyDouble(),
                 Mockito.anyDouble()
         )).thenReturn(mock);
 
-        mockMvc.perform(get("/localizacao"))
+        mockMvc.perform(get("/location"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.cidade").value("Magé"))
-                .andExpect(jsonPath("$.estado").value("RJ"))
-                .andExpect(jsonPath("$.pais").value("Brasil"));
+                .andExpect(jsonPath("$.city").value("Magé"))
+                .andExpect(jsonPath("$.state").value("RJ"))
+                .andExpect(jsonPath("$.country").value("Brasil"));
     }
 
     @Test
     void deveAtualizarLocalizacao() throws Exception {
 
-        LocalizacaoRequest request = new LocalizacaoRequest();
+        LocationRequest request = new LocationRequest();
         request.setLatitude(-22.4138);
         request.setLongitude(-43.1720);
 
-        Localizacao mock = new Localizacao(
+        LocationResponse mock = new LocationResponse(
                 -22.4138,
                 -43.1720,
                 "Petrópolis",
@@ -76,26 +81,26 @@ class LocationControllerTest {
                 "Brasil"
         );
 
-        Mockito.when(locationService.buscarLocalizacao(
+        Mockito.when(locationService.getLocation(
                 Mockito.anyDouble(),
                 Mockito.anyDouble()
         )).thenReturn(mock);
 
         mockMvc.perform(
-                        put("/localizacao")
+                        put("/location")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request))
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.cidade").value("Petrópolis"))
-                .andExpect(jsonPath("$.estado").value("RJ"))
-                .andExpect(jsonPath("$.pais").value("Brasil"));
+                .andExpect(jsonPath("$.city").value("Petrópolis"))
+                .andExpect(jsonPath("$.state").value("RJ"))
+                .andExpect(jsonPath("$.country").value("Brasil"));
     }
 
     @Test
     void deveResetarLocalizacao() throws Exception {
 
-        Localizacao mock = new Localizacao(
+        LocationResponse mock = new LocationResponse(
                 -22.4209,
                 -42.9801,
                 "Magé",
@@ -103,15 +108,15 @@ class LocationControllerTest {
                 "Brasil"
         );
 
-        Mockito.when(locationService.buscarLocalizacao(
+        Mockito.when(locationService.getLocation(
                 Mockito.anyDouble(),
                 Mockito.anyDouble()
         )).thenReturn(mock);
 
-        mockMvc.perform(put("/localizacao/reset"))
+        mockMvc.perform(put("/location/reset"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.cidade").value("Magé"))
-                .andExpect(jsonPath("$.estado").value("RJ"))
-                .andExpect(jsonPath("$.pais").value("Brasil"));
+                .andExpect(jsonPath("$.city").value("Magé"))
+                .andExpect(jsonPath("$.state").value("RJ"))
+                .andExpect(jsonPath("$.country").value("Brasil"));
     }
 }

@@ -1,6 +1,5 @@
 package com.portella.weatherblanket.service;
 
-import com.portella.weatherblanket.entities.OpenMeteoClient;
 import com.portella.weatherblanket.factory.HttpConnectionFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class OpenMeteoClientTest {
+class OpenMeteoClientServiceTest {
 
     @Mock
     private HttpConnectionFactory factory;
@@ -25,7 +24,7 @@ class OpenMeteoClientTest {
     private HttpURLConnection connection;
 
     @InjectMocks
-    private OpenMeteoClient client;
+    private OpenMeteoClientService client;
 
     @Test
     void deveBuscarTemperaturaComSucesso() throws Exception {
@@ -37,9 +36,9 @@ class OpenMeteoClientTest {
         when(connection.getInputStream())
                 .thenReturn(new ByteArrayInputStream(json.getBytes()));
 
-        double temperatura = client.buscarTemperatura(-22.4, -43.1);
+        double temperature = client.getTemperature(-22.4, -43.1);
 
-        assertEquals(26.7, temperatura);
+        assertEquals(26.7, temperature);
     }
 
     @Test
@@ -48,9 +47,9 @@ class OpenMeteoClientTest {
         when(factory.create(any(URL.class)))
                 .thenThrow(new RuntimeException("erro"));
 
-        double temperatura = client.buscarTemperatura(-22.4, -43.1);
+        double temperature = client.getTemperature(-22.4, -43.1);
 
-        assertEquals(Double.MIN_VALUE, temperatura);
+        assertEquals(Double.MIN_VALUE, temperature);
     }
 }
 

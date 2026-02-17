@@ -1,6 +1,5 @@
 package com.portella.weatherblanket.service;
 
-import com.portella.weatherblanket.entities.NominatimClient;
 import com.portella.weatherblanket.exceptions.ServiceException;
 import com.portella.weatherblanket.factory.HttpConnectionFactory;
 import org.junit.jupiter.api.Test;
@@ -17,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class NominatimClientTest {
+class NominatimClientServiceTest {
 
     @Mock
     private HttpConnectionFactory factory;
@@ -26,7 +25,7 @@ class NominatimClientTest {
     private HttpURLConnection connection;
 
     @InjectMocks
-    private NominatimClient client;
+    private NominatimClientService client;
 
     @Test
     void deveBuscarEnderecoComSucesso() throws Exception {
@@ -37,7 +36,7 @@ class NominatimClientTest {
         when(connection.getInputStream())
                 .thenReturn(new ByteArrayInputStream(json.getBytes()));
 
-        String response = client.buscarEndereco(-22.4, -43.1);
+        String response = client.getAddress(-22.4, -43.1);
 
         assertNotNull(response);
         assertTrue(response.contains("Petrópolis"));
@@ -51,7 +50,7 @@ class NominatimClientTest {
 
         ServiceException ex = assertThrows(
                 ServiceException.class,
-                () -> client.buscarEndereco(-22.4, -43.1)
+                () -> client.getAddress(-22.4, -43.1)
         );
 
         assertEquals(502, ex.getStatus());

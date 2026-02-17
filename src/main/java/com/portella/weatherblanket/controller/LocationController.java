@@ -1,8 +1,8 @@
 package com.portella.weatherblanket.controller;
 
-import com.portella.weatherblanket.config.LocationConfig;
-import com.portella.weatherblanket.model.Localizacao;
-import com.portella.weatherblanket.model.LocalizacaoRequest;
+import com.portella.weatherblanket.entities.LocationEntity;
+import com.portella.weatherblanket.model.LocationRequest;
+import com.portella.weatherblanket.model.LocationResponse;
 import com.portella.weatherblanket.service.LocationService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -18,43 +18,43 @@ public class LocationController {
     }
 
 
-    @GetMapping("/localizacao")
-    public Localizacao getLocalizacaoAtual() {
-        return locationService.buscarLocalizacao(
-                LocationConfig.getLatitude(),
-                LocationConfig.getLongitude()
+    @GetMapping("/location")
+    public LocationResponse getCurrentLocation() {
+        return locationService.getLocation(
+                LocationEntity.getLatitude(),
+                LocationEntity.getLongitude()
         );
     }
 
-    @PutMapping("/localizacao")
-    public Localizacao atualizar(@RequestBody LocalizacaoRequest request) {
+    @PutMapping("/location")
+    public LocationResponse updateLocation(@RequestBody LocationRequest request) {
 
         double latitude = request.getLatitude();
         double longitude = request.getLongitude();
 
-        LocationConfig.setLatitude(latitude);
-        LocationConfig.setLongitude(longitude);
+        LocationEntity.setLatitude(latitude);
+        LocationEntity.setLongitude(longitude);
 
-        Localizacao localizacao = locationService.buscarLocalizacao(latitude, longitude);
+        LocationResponse location = locationService.getLocation(latitude, longitude);
 
-        LocationConfig.setCidade(localizacao.getCidade());
-        LocationConfig.setEstado(localizacao.getEstado());
-        LocationConfig.setPais(localizacao.getPais());
+        LocationEntity.setCity(location.getCity());
+        LocationEntity.setState(location.getState());
+        LocationEntity.setCountry(location.getCountry());
 
-        System.out.println("Foi alterada a localização para a cidade: " + localizacao.getCidade());
+        System.out.println("Location was changed to: " + location.getCity());
 
-        return localizacao;
+        return location;
     }
 
-    @PutMapping("/localizacao/reset")
-    public Localizacao resetarLocalizacao() {
+    @PutMapping("/location/reset")
+    public LocationResponse resetLocation() {
 
-        LocationConfig.setLatitude(-22.4209);
-        LocationConfig.setLongitude(-42.9801);
+        LocationEntity.setLatitude(-22.4209);
+        LocationEntity.setLongitude(-42.9801);
 
-        return locationService.buscarLocalizacao(
-                LocationConfig.getLatitude(),
-                LocationConfig.getLongitude()
+        return locationService.getLocation(
+                LocationEntity.getLatitude(),
+                LocationEntity.getLongitude()
         );
 
     }

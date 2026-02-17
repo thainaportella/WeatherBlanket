@@ -1,27 +1,75 @@
 openapi: 3.0.3
-
 info:
-  title: Weather Blanket API
-  description: API pessoal para registro e consulta de temperaturas e localização.
+  title: Temperature Blanket API
+  description: Personal API for temperature and location recording and querying. Secured using JWT.
   version: 1.0.0
+
+security:
+  - bearerAuth: []
 
 servers:
   - url: http://157.173.123.125:8080
-    description: Produção
+    description: Prod
   - url: http://localhost:8080
-    description: Ambiente local
+    description: Local
 
 paths:
+  /login:
+    post:
+      summary: Authenticate to obtain a JWT token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user
+                - password
+              properties:
+                user:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Successfully authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Invalid Credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
-  /registros:
+  /temperature-records:
     get:
-      summary: Lista registros de temperatura
+      summary: Retrieve temperature records
       parameters:
         - name: limit
           in: query
           required: false
           schema:
             type: integer
+        - name: year
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: month
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: OK
@@ -30,104 +78,86 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/RegistroTemperatura'
+                  $ref: '#/components/schemas/TemperatureRecordResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/InternalError'
 
-  /localizacao:
+  /temperature-records/{date}/done:
+    put:
+      summary: Mark the selected day as Done
+      parameters:
+        - name: date
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Status successfully changed to Done
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /location:
     get:
-      summary: Obtém localização atual
+      summary: Get current location
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Localizacao'
+                $ref: '#/components/schemas/LocationResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
 
     put:
-      summary: Atualiza localização
+      summary: Update location
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LocalizacaoRequest'
+              $ref: '#/components/schemas/LocationRequest'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Localizacao'
+                $ref: '#/components/schemas/LocationResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
 
-  /localizacao/reset:
+  /location/reset:
     put:
-      summary: Reseta localização padrão
+      summary: Reset to base location
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Localizacao'
+                $ref: '#/components/schemas/LocationResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
 
   schemas:
-
-    RegistroTemperatura:
-      type: object
-      required:
-        - data
-        - hora
-        - temperatura
-        - cor
-        - cor_oficial
-      properties:
-        data:
-          type: string
-        hora:
-          type: string
-        temperatura:
-          type: number
-          format: double
-        cor:
-          type: string
-        cor_oficial:
-          type: string
-
-    Localizacao:
-      type: object
-      required:
-        - latitude
-        - longitude
-        - cidade
-        - estado
-        - pais
-      properties:
-        latitude:
-          type: number
-          format: double
-          example: -22.65758
-        longitude:
-          type: number
-          format: double
-          example: -43.03837
-        cidade:
-          type: string
-          example: "Magé"
-        estado:
-          type: string
-          example: "RJ"
-        pais:
-          type: string
-          example: "Brasil"
-
-
-    LocalizacaoRequest:
+    LocationRequest:
       type: object
       required:
         - latitude
@@ -139,6 +169,60 @@ components:
         longitude:
           type: number
           format: double
+
+    LoginResponse:
+      type: object
+      required:
+        - access_token
+      properties:
+        access_token:
+          type: string
+
+    TemperatureRecordResponse:
+      type: object
+      required:
+        - date
+        - time
+        - temperature
+        - color
+        - yarn_color
+        - status
+      properties:
+        date:
+          type: string
+        time:
+          type: string
+        temperature:
+          type: number
+          format: double
+        color:
+          type: string
+        yarn_color:
+          type: string
+        status:
+          type: string
+
+    LocationResponse:
+      type: object
+      required:
+        - latitude
+        - longitude
+        - city
+        - state
+        - country
+      properties:
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+        city:
+          type: string
+        state:
+          type: string
+        country:
+          type: string
 
     ErrorResponse:
       type: object
@@ -155,16 +239,29 @@ components:
           type: string
 
   responses:
-
     BadRequest:
-      description: Bad Request
+      description: Requisição inválida
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Unauthorized:
+      description: Token ausente, expirado ou inválido
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: Recurso não encontrado
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
 
     InternalError:
-      description: Internal Server Error
+      description: Erro interno no servidor
       content:
         application/json:
           schema:

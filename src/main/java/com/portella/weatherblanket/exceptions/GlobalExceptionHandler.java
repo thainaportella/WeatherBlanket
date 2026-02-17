@@ -27,6 +27,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(response);
     }
 
+    @ExceptionHandler(org.springframework.security.authentication.BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentials(org.springframework.security.authentication.BadCredentialsException ex) {
+        ErrorResponse response = new ErrorResponse(
+                403,
+                "FORBIDDEN",
+                "Invalid authentication."
+        );
+
+        return ResponseEntity
+                .status(403)
+                .body(response);
+    }
+
     @Override
     protected ResponseEntity<Object> handleNoHandlerFoundException(
             NoHandlerFoundException ex,
@@ -37,7 +50,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         ErrorResponse response = new ErrorResponse(
                 404,
                 "ENDPOINT_NOT_FOUND",
-                "Endpoint não encontrado."
+                "Endpoint was not found."
         );
 
         return ResponseEntity
@@ -51,7 +64,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         ErrorResponse response = new ErrorResponse(
                 500,
                 "INTERNAL_SERVER_ERROR",
-                "Ocorreu um erro não mapeado."
+                "An unexpected error occurred."
         );
 
         return ResponseEntity

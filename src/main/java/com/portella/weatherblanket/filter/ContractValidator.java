@@ -1,4 +1,4 @@
-package com.portella.weatherblanket.support;
+package com.portella.weatherblanket.filter;
 
 import com.portella.weatherblanket.exceptions.ContractViolationException;
 import com.portella.weatherblanket.filter.EndpointContract;
@@ -11,11 +11,12 @@ public class ContractValidator {
             EndpointContract contract
     ) {
 
+
         if (!request.getMethod().equals(contract.getMethod())) {
             throw new ContractViolationException(
                     405,
                     "METHOD_NOT_ALLOWED",
-                    "Método inválido para este endpoint."
+                    "Invalid HTTP method for this endpoint."
             );
         }
 
@@ -24,7 +25,7 @@ public class ContractValidator {
                 throw new ContractViolationException(
                         400,
                         "INVALID_QUERY_PARAM",
-                        "Parâmetro inválido: " + param
+                        "Invalid request parameter: " + param
                 );
             }
         });
@@ -33,8 +34,21 @@ public class ContractValidator {
             throw new ContractViolationException(
                     400,
                     "BODY_REQUIRED",
-                    "Body obrigatório para este endpoint."
+                    "Request body is required."
             );
+        }
+
+        if (contract.getPath().equals("/temperature-records")) {
+            String month = request.getParameter("month");
+            String year = request.getParameter("year");
+
+            if (month != null && year == null) {
+                throw new ContractViolationException(
+                        400,
+                        "Bad Request",
+                        "The parameter 'month' requires the presence of the parameter 'year'."
+                );
+            }
         }
     }
 }

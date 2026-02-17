@@ -4,14 +4,15 @@ import com.portella.weatherblanket.filter.EndpointContract;
 
 import java.util.Set;
 
-public class LocalizacaoResetPutContract {
+public class LocationPutContract {
 
     public static final EndpointContract CONTRACT =
             new EndpointContract(
-                    "/localizacao/reset",
+                    "/location",
                     "PUT",
                     Set.of(),
-                    false
+                    true
             );
 }
+
 

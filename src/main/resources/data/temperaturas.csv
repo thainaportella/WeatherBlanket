@@ -1,4 +1,4 @@
-data,hour,temp_celsius,cor,cor_oficial
+data,hour,temp_celsius,cor,cor_oficial,status
 2026-01-23,13:40,26.4,MOSTARDA,mostarda
 2026-01-24,13:40,26.4,MOSTARDA,mostarda
 2026-01-25,13:40,26.4,MOSTARDA,mostarda

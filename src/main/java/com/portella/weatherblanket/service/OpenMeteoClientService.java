@@ -1,5 +1,6 @@
-package com.portella.weatherblanket.entities;
+package com.portella.weatherblanket.service;
 
+import com.portella.weatherblanket.entities.WeatherClient;
 import com.portella.weatherblanket.factory.HttpConnectionFactory;
 import org.springframework.stereotype.Service;
 
@@ -9,16 +10,16 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 @Service
-public class OpenMeteoClient implements WeatherClient {
+public class OpenMeteoClientService implements WeatherClient {
 
     private final HttpConnectionFactory factory;
 
-    public OpenMeteoClient(HttpConnectionFactory factory) {
+    public OpenMeteoClientService(HttpConnectionFactory factory) {
         this.factory = factory;
     }
 
     @Override
-    public double buscarTemperatura(double lat, double lon) {
+    public double getTemperature(double lat, double lon) {
 
         try {
             URL url = new URL(

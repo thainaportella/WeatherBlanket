@@ -1,4 +1,4 @@
-package com.portella.weatherblanket.entities;
+package com.portella.weatherblanket.service;
 
 import com.portella.weatherblanket.exceptions.ServiceException;
 import com.portella.weatherblanket.factory.HttpConnectionFactory;
@@ -10,15 +10,15 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 @Service
-public class NominatimClient {
+public class NominatimClientService {
 
     private final HttpConnectionFactory factory;
 
-    public NominatimClient(HttpConnectionFactory factory) {
+    public NominatimClientService(HttpConnectionFactory factory) {
         this.factory = factory;
     }
 
-    public String buscarEndereco(double latitude, double longitude) {
+    public String getAddress(double latitude, double longitude) {
 
         try {
             String urlStr =
@@ -53,7 +53,7 @@ public class NominatimClient {
             throw new ServiceException(
                     502,
                     "SEARCH_LOCATION_ERROR",
-                    "Erro ao buscar localização no Nominatim"
+                    "Error retrieving location from Nominatim."
             );
         }
     }

@@ -13,10 +13,21 @@ spring:
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
+
   jpa:
     hibernate:
       ddl-auto: update
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+
 server:
   address: 0.0.0.0
   port: 8080
+
+
+api:
+  security:
+    token:
+      secret: ${JWT_SECRET}
+    login:
+      username: ${JWT_USERNAME}
+      password: ${JWT_PASSWORD}

@@ -4,13 +4,13 @@ import com.portella.weatherblanket.filter.EndpointContract;
 
 import java.util.Set;
 
-public class LocalizacaoGetContract {
+public class TokenPostContract {
 
     public static final EndpointContract CONTRACT =
             new EndpointContract(
-                    "/localizacao",
-                    "GET",
+                    "/login",
+                    "POST",
                     Set.of(),
-                    false
+                    true
             );
 }

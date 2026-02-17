@@ -1,8 +1,7 @@
 package com.portella.weatherblanket.service;
 
-import com.portella.weatherblanket.entities.NominatimClient;
 import com.portella.weatherblanket.exceptions.ServiceException;
-import com.portella.weatherblanket.model.Localizacao;
+import com.portella.weatherblanket.model.LocationResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class LocationServiceTest {
 
     @Mock
-    private NominatimClient nominatimClient;
+    private NominatimClientService nominatimClientService;
 
     @InjectMocks
     private LocationService locationService;
@@ -35,30 +34,30 @@ class LocationServiceTest {
             }
             """;
 
-        Mockito.when(nominatimClient.buscarEndereco(
+        Mockito.when(nominatimClientService.getAddress(
                 Mockito.anyDouble(),
                 Mockito.anyDouble()
         )).thenReturn(jsonMock);
 
-        Localizacao result =
-                locationService.buscarLocalizacao(-22.41, -43.17);
+        LocationResponse result =
+                locationService.getLocation(-22.41, -43.17);
 
-        assertEquals("Petrópolis", result.getCidade());
-        assertEquals("RJ", result.getEstado());
-        assertEquals("Brasil", result.getPais());
+        assertEquals("Petrópolis", result.getCity());
+        assertEquals("RJ", result.getState());
+        assertEquals("Brasil", result.getCountry());
     }
 
     @Test
     void deveLancarServiceExceptionQuandoApiFalhar() {
 
-        Mockito.when(nominatimClient.buscarEndereco(
+        Mockito.when(nominatimClientService.getAddress(
                 Mockito.anyDouble(),
                 Mockito.anyDouble()
         )).thenThrow(new RuntimeException("erro externo"));
 
         assertThrows(
                 ServiceException.class,
-                () -> locationService.buscarLocalizacao(-22.41, -43.17)
+                () -> locationService.getLocation(-22.41, -43.17)
         );
     }
 }
